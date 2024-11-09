@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prontuário de Instalações Elétricas (PIE)</title>
+    
+    <link rel="manifest" href="manifest.json">
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./service-worker.js')
+        .then(function(registration) {
+            console.log('Service Worker registrado com sucesso:', registration);
+        })
+        .catch(function(error) {
+            console.log('Falha ao registrar o Service Worker:', error);
+        });
+    }
+</script> 
+    
+    
+    
+    
+    <style>
+        /* Estilos básicos e personalizações */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; color: #333; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); }
+        h1 { color: #0d3b66; text-align: center; margin-bottom: 20px; }
+        .section { margin-top: 20px; padding: 15px; border-radius: 8px; background-color: #0d3b66; color: #fff; }
+        .section h2 { font-size: 18px; margin-bottom: 10px; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background-color: #ffffff; color: #333; }
+        table th, table td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        table th { background-color: #0d3b66; color: #fff; }
+        .add-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .add-row input, .add-row button { padding: 8px; font-size: 14px; border-radius: 5px; border: 1px solid #ddd; flex: 1; }
+        .add-row button { background-color: #0d3b66; color: #fff; cursor: pointer; border: none; }
+        .delete-button { background-color: #e74c3c; color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        .image-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; }
+        .export-buttons { margin-top: 20px; text-align: center; }
+        .export-buttons button { margin: 5px; padding: 10px 20px; font-size: 16px; background-color: #0d3b66; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+        .export-buttons button:hover { background-color: #074b80; }
+    </style>
+    <!-- Inclui a biblioteca jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+<body>
+  
+<div class="container">
+    <h1>Prontuário de Instalações Elétricas (PIE)</h1>
+    <p>Controle e monitoramento das exigências do PIE.</p>
+
+    <!-- Seções de itens com tabelas de entrada -->
+    <!-- 1. Diagramas Unifilares -->
+    <div class="section">
+        <h2>1. Diagramas Unifilares</h2>
+        <div class="table-container">
+            <table id="table-diagramas">
+                <tr><th>Descrição</th><th>Data</th><th>Hora</th><th>Foto</th><th>Ação</th></tr>
+            </table>
+            <div class="add-row">
+                <input type="text" id="desc-diagramas" placeholder="Descrição">
+                <input type="date" id="date-diagramas">
+                <input type="time" id="time-diagramas">
+                <input type="file" id="file-diagramas" accept="image/*" capture="environment">
+                <button onclick="addRow('table-diagramas', 'desc-diagramas', 'date-diagramas', 'time-diagramas', 'file-diagramas')">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <!-- 2. Especificações do Sistema de Aterramento Elétrico -->
+    <div class="section">
+        <h2>2. Especificações do Sistema de Aterramento Elétrico</h2>
+        <div class="table-container">
+            <table id="table-inspecao">
+                <tr><th>Descrição</th><th>Data</th><th>Hora</th><th>Foto</th><th>Ação</th></tr>
+            </table>
+            <div class="add-row">
+                <input type="text" id="desc-inspecao" placeholder="Descrição">
+                <input type="date" id="date-inspecao">
+                <input type="time" id="time-inspecao">
+                <input type="file" id="file-inspecao" accept="image/*" capture="environment">
+                <button onclick="addRow('table-inspecao', 'desc-inspecao', 'date-inspecao', 'time-inspecao', 'file-inspecao')">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <!-- 3. Especificações dos dispositivos de Proteção -->
+    <div class="section">
+        <h2>3. Especificações dos Dispositivos de Proteção</h2>
+        <div class="table-container">
+            <table id="table-medicoes">
+                <tr><th>Descrição</th><th>Data</th><th>Hora</th><th>Foto</th><th>Ação</th></tr>
+            </table>
+            <div class="add-row">
+                <input type="text" id="desc-medicoes" placeholder="Descrição">
+                <input type="date" id="date-medicoes">
+                <input type="time" id="time-medicoes">
+                <input type="file" id="file-medicoes" accept="image/*" capture="environment">
+                <button onclick="addRow('table-medicoes', 'desc-medicoes', 'date-medicoes', 'time-medicoes', 'file-medicoes')">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <!-- 4. Laudo das Instalações Elétricas -->
+    <div class="section">
+        <h2>4. Laudo das Instalações Elétricas</h2>
+        <div class="table-container">
+            <table id="table-laudos">
+                <tr><th>Descrição</th><th>Data</th><th>Hora</th><th>Foto</th><th>Ação</th></tr>
+            </table>
+            <div class="add-row">
+                <input type="text" id="desc-laudos" placeholder="Descrição">
+                <input type="date" id="date-laudos">
+                <input type="time" id="time-laudos">
+                <input type="file" id="file-laudos" accept="image/*" capture="environment">
+                <button onclick="addRow('table-laudos', 'desc-laudos', 'date-laudos', 'time-laudos', 'file-laudos')">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <!-- 5. Cronograma de Manutenções -->
+    <div class="section">
+        <h2>5. Cronograma de Manutenções</h2>
+        <div class="table-container">
+            <table id="table-corrretivas">
+                <tr><th>Descrição</th><th>Data</th><th>Hora</th><th>Foto</th><th>Ação</th></tr>
+            </table>
+            <div class="add-row">
+                <input type="text" id="desc-corrretivas" placeholder="Descrição">
+                <input type="date" id="date-corrretivas">
+                <input type="time" id="time-corrretivas">
+                <input type="file" id="file-corrretivas" accept="image/*" capture="environment">
+                <button onclick="addRow('table-corrretivas', 'desc-corrretivas', 'date-corrretivas', 'time-corrretivas', 'file-corrretivas')">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <!-- 6. Laudo Anual de Termografia -->
+    <div class="section">
+        <h2>6. Laudo Anual de Termografia</h2>
+        <div class="table-container">
+            <table id="table-preventivas">
+                <tr><th>Descrição</th><th>Data</th><th>Hora</th><th>Foto</th><th>Ação</th></tr>
+            </table>
+            <div class="add-row">
+                <input type="text" id="desc-preventivas" placeholder="Descrição<input type="date" id="date-preventivas">
+                <input type="time" id="time-preventivas">
+                <input type="file" id="file-preventivas" accept="image/*" capture="environment">
+                <button onclick="addRow('table-preventivas', 'desc-preventivas', 'date-preventivas', 'time-preventivas', 'file-preventivas')">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <!-- 7. Treinamentos dos Trabalhadores -->
+    <div class="section">
+        <h2>7. Treinamentos dos Trabalhadores</h2>
+        <div class="table-container">
+            <table id="table-treinamentos">
+                <tr><th>Descrição</th><th>Data</th><th>Hora</th><th>Foto</th><th>Ação</th></tr>
+            </table>
+            <div class="add-row">
+                <input type="text" id="desc-treinamentos" placeholder="Descrição">
+                <input type="date" id="date-treinamentos">
+                <input type="time" id="time-treinamentos">
+                <input type="file" id="file-treinamentos" accept="image/*" capture="environment">
+                <button onclick="addRow('table-treinamentos', 'desc-treinamentos', 'date-treinamentos', 'time-treinamentos', 'file-treinamentos')">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    <!-- 8. Análises de Riscos Elétricos -->
+    <div class="section">
+        <h2>8. Análises de Riscos Elétricos</h2>
+        <div class="table-container">
+            <table id="table-riscos">
+                <tr><th>Descrição</th><th>Data</th><th>Hora</th><th>Foto</th><th>Ação</th></tr>
+            </table>
+            <div class="add-row">
+                <input type="text" id="desc-riscos" placeholder="Descrição">
+                <input type="date" id="date-riscos">
+                <input type="time" id="time-riscos">
+                <input type="file" id="file-riscos" accept="image/*" capture="environment">
+                <button onclick="addRow('table-riscos', 'desc-riscos', 'date-riscos', 'time-riscos', 'file-riscos')">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    
+    
+    
+
+    <!-- Botões de Exportação e E-mail -->
+    <div class="export-buttons">
+        <button onclick="exportToPDF()">Exportar para PDF</button>
+        <button onclick="window.print()">Imprimir</button>
+        <button onclick="sendEmail()">Enviar por E-mail</button>
+    </div>
+</div>
+
+<script>
+    function addRow(tableId, descId, dateId, timeId, fileId) {
+        const table = document.getElementById(tableId);
+        const desc = document.getElementById(descId).value;
+        const date = document.getElementById(dateId).value;
+        const time = document.getElementById(timeId).value;
+        const fileInput = document.getElementById(fileId);
+        
+        if (desc === "" || date === "" || time === "") {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        const row = table.insertRow();
+        row.insertCell(0).innerText = desc;
+        row.insertCell(1).innerText = date;
+        row.insertCell(2).innerText = time;
+
+        const imgCell = row.insertCell(3);
+        if (fileInput.files.length > 0) {
+            const img = document.createElement("img");
+            img.classList.add("image-preview");
+            img.src = URL.createObjectURL(fileInput.files[0]);
+            img.onload = function() {
+                URL.revokeObjectURL(img.src); // Libera memória
+            };
+            imgCell.appendChild(img);
+        } else {
+            imgCell.innerText = "Sem foto";
+        }
+
+        const deleteCell = row.insertCell(4);
+        const deleteButton = document.createElement("button");
+        deleteButton.innerText = "Excluir";
+        deleteButton.className = "delete-button";
+        deleteButton.onclick = function() {
+            table.deleteRow(row.rowIndex);
+        };
+        deleteCell.appendChild(deleteButton);
+
+        document.getElementById(descId).value = "";
+        document.getElementById(dateId).value = "";
+        document.getElementById(timeId).value = "";
+        fileInput.value = "";
+    }
+
+    function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Adiciona título ao PDF
+        doc.text("Prontuário de Instalações Elétricas (PIE)", 10, 10);
+
+        // Exporta cada seção para o PDF
+        document.querySelectorAll('.section').forEach((section, index) => {
+            const title = section.querySelector('h2').innerText;
+            doc.text(title, 10, 20 + index * 30);
+            const table = section.querySelector('table');
+            
+            // Adiciona conteúdo da tabela
+            [...table.rows].forEach((row, rowIndex) => {
+                let rowText = [...row.cells].map(cell => cell.innerText).join(" | ");
+                doc.text(rowText, 10, 30 + rowIndex * 10 + index * 30);
+            });
+        });
+
+        doc.save("PIE_Report.pdf");
+    }
+
+    function sendEmail() {
+        const email = prompt("Digite o e-mail para envio:");
+        if (email) {
+            window.location.href = `mailto:${email}?subject=Prontuário de Instalações Elétricas&body=Segue em anexo o relatório do PIE.`;
+        }
+    }
+</script>
+
+</body>
+</html>
